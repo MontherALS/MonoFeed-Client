@@ -1,13 +1,15 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import toast from "react-hot-toast";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { LoginType, LogInUserDataType } from "@/Types/AuthType";
+import { LoginType } from "@/Types/AuthType";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
+  const { login } = useAuth();
+  
   const [formData, setFormData] = useState<LoginType>({
     email: "",
     password: "",
@@ -19,24 +21,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/auth/login", formData, { withCredentials: true });
-      if (!res.data?.token) {
-        toast.error("Wrong email or password");
-        return;
-      }
-      localStorage.setItem("token", res.data.token); //! chane it to cookie later
-
-      const { userData } = res.data as LogInUserDataType;
-      localStorage.setItem("id", userData.id); //! chane it to cookie later
-
-      toast.success("Login successful");
-      window.location.href = "/";
-    } catch (error: any) {
-      console.error(error);
-      const errorMessage = error?.response?.data?.message || error?.message || "Login failed";
-      toast.error(errorMessage);
-    }
+    await login(formData.email, formData.password);
   };
 
   return (

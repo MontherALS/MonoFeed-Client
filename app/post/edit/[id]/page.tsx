@@ -10,10 +10,12 @@ import { authFetch } from "@/lib/authFetch";
 import { PostType } from "@/Types/PostTypes";
 import { CategoryWithotPostsType } from "@/Types/CategoryType";
 import PostPlayer from "../../[id]/PostPlayer";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function EditPostPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
   const [post, setPost] = useState<PostType | null>(null);
   const [postData, setPostData] = useState({
     post_title: "",
@@ -29,10 +31,9 @@ export default function EditPostPage() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
+        if (!isAuthenticated || !user) {
           toast.error("Unauthorized");
-          router.push("/");
+          router.push("/login");
           return;
         }
 
@@ -52,14 +53,13 @@ export default function EditPostPage() {
         });
         setSelectedCategory(postData.category?.map((c) => c.category_name) || []);
 
-        const authorId = localStorage.getItem("id");
-        if (authorId !== postData.authorId) {
+        if (user.id !== postData.authorId) {
           toast.error("You don't have permission to edit this post");
           router.push(`/`);
           return;
         }
       } catch (err) {
-        console.error("Error fetching post:", err);
+        console.error("Error fetching post:", err as Error);
         toast.error("Failed to load post");
         router.push("/");
       } finally {
@@ -73,13 +73,13 @@ export default function EditPostPage() {
         const data = await res?.json();
         setCategory(data);
       } catch (err) {
-        console.log("error happened ", err);
+        console.error("Error fetching categories:", err);
       }
     };
 
       fetchPost();
       fetchCategories();
-  }, [id, router]);
+  }, [id, router, isAuthenticated, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -94,9 +94,7 @@ export default function EditPostPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      const token = localStorage.getItem("token");
-
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Unauthorized please re-login");
         return;
       }

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FiUser, FiHome, FiHeart, FiGrid, FiLogOut, FiPlay } from "react-icons/fi";
-import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navigationCategories = [
   { name: "Home", icon: FiHome, path: "/" },
@@ -14,28 +14,12 @@ const navigationCategories = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [id, setId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    const storedId = localStorage.getItem("id");
-    setToken(storedToken);
-    setId(storedId);
-  }, [pathname]);
+  const { isAuthenticated, user, logout } = useAuth();
 
   const handleLogout = () => {
     const confirm = window.confirm("are you sure you want to logout ?");
     if (!confirm) return;
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("id");
-
-    setToken(null);
-
-    toast.success("Logged out successfully");
-    router.push("/");
+    logout();
   };
 
   const getActiveCategory = () => {
@@ -55,14 +39,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
-            {/* <Image
-              src={logo}
-              alt="Bite Marks Logo"
-              width={60}
-              height={64}
-              priority
-              className="object-contain w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
-            /> */}
+     
             <p className="hidden sm:block text-primary font-bold text-lg md:text-xl group-hover:scale-105 transition-transform duration-300 tracking-tight">MonoFeed</p>
           </Link>
 
@@ -88,10 +65,10 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {token ? (
+            {isAuthenticated && user ? (
               <>
                 <Link
-                  href={`/profile/${id}`}
+                  href={`/profile/${user.id}`}
                   className="flex items-center gap-2 text-foreground hover:text-white/80 transition-all duration-300 text-sm font-semibold hover:scale-105"
                 >
                   <FiUser className="w-4 h-4" />

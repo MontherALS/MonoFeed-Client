@@ -26,7 +26,7 @@ export default function CategoriesPage() {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const res = await axios.get<CategoriesResponse>("http://localhost:5000/categories");
+        const res = await axios.get<CategoriesResponse>(`${process.env.NEXT_PUBLIC_SERVER_URL}/categories`);
         setCategories(res.data.categories);
         setPopular(res.data.popular);
         setError(null);

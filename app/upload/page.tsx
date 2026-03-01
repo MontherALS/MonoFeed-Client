@@ -9,14 +9,19 @@ import toast from "react-hot-toast";
 import { authFetch } from "@/lib/authFetch";
 import axios from "axios";
 import { CategoryWithotPostsType } from "@/Types/CategoryType";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [postData, setPostData] = useState({
     post_title: "",
     description: "",
   });
+  const MAX_SIZE = Number(process.env.NEXT_PUBLIC_MAX_POST_SIZE);
   const [category, setCategory] = useState<CategoryWithotPostsType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [query, setQuery] = useState<string>("");
@@ -24,9 +29,9 @@ export default function UploadPage() {
   const [showCategory, setShowCategory] = useState<boolean>(false);
 
   useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (!token) {
+      if (!isAuthenticated) {
         toast.error("Unauthorized");
+        router.push("/login");
         return;
       }
       const getcategories = async () => {
@@ -35,24 +40,29 @@ export default function UploadPage() {
           const data = await res?.json();
           setCategory(data);
         } catch (err) {
-          console.log("error happend ", err);
+          console.error("error happend ", err);
         }
       };
       getcategories();
-  }, []);
+  }, [isAuthenticated, router]);
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
+if (selectedFile && selectedFile.size > MAX_SIZE){
+        toast.error(`File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(selectedFile.size / 1024 / 1024).toFixed(2)}MB`);
+        e.target.value = "";
+        setFile(null);
+        setPreview(null);
+        return; 
+      }
+    if (selectedFile && selectedFile.size <= MAX_SIZE) {
+      setFile(selectedFile); 
 
-    if (selectedFile) {
-      setFile(selectedFile); //!
-
-      const reader = new FileReader(); //!
+      const reader = new FileReader();
 
       reader.onloadend = () => {
-        //!
-        setPreview(reader.result as string); //!
+        setPreview(reader.result as string); 
       };
-      reader.readAsDataURL(selectedFile); //!
+      reader.readAsDataURL(selectedFile); 
     }
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,9 +77,7 @@ export default function UploadPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault();
-      const token = localStorage.getItem("token");
-
-      if (!token) {
+      if (!isAuthenticated) {
         toast.error("Unathorized please re-login");
         return;
       }
@@ -78,9 +86,10 @@ export default function UploadPage() {
         return;
       }
 
-      const MAX_SIZE = 500 * 1024 * 1024;
-      if (file.size > MAX_SIZE)
-        return alert(`File size must be < 500MB\nYour file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      if (file.size > MAX_SIZE){
+        toast.error(`File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+        return; 
+      }
 
       setIsSubmitting(true);
 

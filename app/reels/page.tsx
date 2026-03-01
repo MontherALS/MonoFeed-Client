@@ -17,7 +17,7 @@ export default function ReelsPage() {
       try {
         setLoading(true);
         const res = await axios.get<PostTypeWithPages>(
-          `http://localhost:5000/posts/all?page=${selectedPage}&limit=8`
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/posts/all?page=${selectedPage}&limit=8`
         );
         
         const publicPosts = res.data.posts.filter((post) => !post.author?.isPrivate);
@@ -77,7 +77,6 @@ export default function ReelsPage() {
         ))}
       </div>
       
-      {/* Pagination */}
       <div className="py-4">
         <Pagination
           totalPages={totalPages}

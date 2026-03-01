@@ -11,10 +11,12 @@ import Image from "next/image";
 import EditProfileModule from "@/app/profile/EditProfileMoudule";
 import ProfilePostsGrid from "@/app/profile/ProfilePostGrid";
 import ProfileActionPage from "../ProfileAction";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
+  const { isAuthenticated, user, isLoading } = useAuth();
 
   const [userData, setUserData] = useState<UserProfileType>();
   const [autherId, setAutherId] = useState<string>("");
@@ -37,15 +39,15 @@ export default function ProfilePage() {
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (isLoading) return;
+    
+    if (!isAuthenticated || !user) {
       toast.error("Please log in");
       router.push("/login");
       return;
     }
 
-    const authId = localStorage.getItem("id") as string;
-    setAutherId(authId);
+    setAutherId(user.id);
 
     const getUser = async () => {
       const res = await authFetch(`/profiles/${id}`);
@@ -65,13 +67,12 @@ export default function ProfilePage() {
         newPassword: "",
         confirmPassword: "",
       });
-      const checkIsFollow = user.followers?.some((f) => f.followerId === authId) || false;
-      console.log(checkIsFollow);
+      const checkIsFollow = user.followers?.some((f) => f.followerId === autherId) || false;
       setIsFollowing(checkIsFollow);
     };
 
     getUser();
-  }, [id, router]);
+  }, [id, router, isAuthenticated, user, isLoading]);
 
   const handleDeletePost = async (postId: string, postName: string) => {
     const confirm = window.confirm(`Delete post: ${postName}?`);

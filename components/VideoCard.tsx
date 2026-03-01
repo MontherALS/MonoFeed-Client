@@ -7,8 +7,8 @@ import Image from "next/image";
 import { VideoCardPropsType } from "@/Types/PropType";
 
 export default function VideoCard({ id, username, title, post_url, authorId, avatar }: VideoCardPropsType) {
-  const videoRef = useRef<HTMLVideoElement>(null); //
-  const cardRef = useRef<HTMLDivElement>(null); //
+  const videoRef = useRef<HTMLVideoElement>(null); 
+  const cardRef = useRef<HTMLDivElement>(null); 
   const [count, setCount] = useState<number>(1);
 
   const isVideo =
@@ -35,7 +35,6 @@ export default function VideoCard({ id, username, title, post_url, authorId, ava
     );
 
     if (cardRef.current) {
-      console.log(count);
       observer.observe(cardRef.current);
     }
 

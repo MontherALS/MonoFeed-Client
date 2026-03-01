@@ -28,7 +28,7 @@ export default function SignupPage() {
         return toast.error("Password should match");
       }
 
-      const res = await axios.post("http://localhost:5000/auth/signup", formData);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/auth/signup`, formData);
 
       if (!res) {
         toast.error("Error hppend");
@@ -40,7 +40,7 @@ export default function SignupPage() {
     } catch (error: any) {
       console.error(error);
       const errorMessage = error?.response?.data?.message || error?.message || "Signup failed";
-      console.log("errorMessage", errorMessage);
+      console.error("errorMessage", errorMessage);
       toast.error(errorMessage);
     }
   };

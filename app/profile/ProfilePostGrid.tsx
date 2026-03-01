@@ -27,7 +27,6 @@ export default function ProfilePostsGrid({ userData, autherId, handleDeletePost,
               key={post.key}
               className="group flex flex-col gap-3"
             >
-              {/* Thumbnail */}
               <div className="relative w-full aspect-[4/3] bg-dark-light rounded-xl overflow-hidden border border-neon-purple/25 transition-all duration-300 group-hover:border-neon-purple group-hover:shadow-glow-purple">
                 {isVideo ? (
                   <>
@@ -98,7 +97,6 @@ export default function ProfilePostsGrid({ userData, autherId, handleDeletePost,
                 </div>
               </div>
 
-              {/* Post Info Card */}
               <div className="bg-dark-light/50 border border-neon-purple/10 rounded-lg p-3 space-y-2.5">
                 <h4 className="text-lg font-bold text-white text-center group-hover:text-neon-cyan transition-colors line-clamp-2 leading-snug">
                   {post.post_title}

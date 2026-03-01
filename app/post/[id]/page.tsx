@@ -9,9 +9,11 @@ import Image from "next/image";
 import { PostType } from "@/Types/PostTypes";
 import { authFetch } from "@/lib/authFetch";
 import PostPlayer from "./PostPlayer";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function VideoPage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const [post, setPost] = useState<PostType>();
   const [authorId, setAuthorId] = useState<string>("");
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
@@ -20,36 +22,38 @@ export default function VideoPage() {
   const [isFollowLoading, setIsFollowLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    try {
-      const authorId = localStorage.getItem("id") as string;
-      setAuthorId(authorId);
+    const currentUserId = user?.id ?? "";
+    setAuthorId(currentUserId);
 
-      const getVideo = async () => {
-        try {
-          const res = await authFetch(`/posts/post/${id}`);
-          const data = await res?.json();
-          const post = data as PostType;
-          setPost(post);
-          const checkIsFavorite = post.favorited_by?.some((arr) => arr.id == authorId);
-          const checkIsFollow = post.author.followers?.some((f) => f.followerId === authorId) || false;
+    const getVideo = async () => {
+      try {
+        const res = await authFetch(`/posts/post/${id}`);
+        const data = await res?.json();
+        const post = data as PostType;
+        setPost(post);
+
+        if (currentUserId) {
+          const checkIsFavorite = post.favorited_by?.some((arr) => arr.id == currentUserId);
+          const checkIsFollow = post.author.followers?.some((f) => f.followerId === currentUserId) || false;
           setIsFollowing(checkIsFollow as boolean);
           setIsFavorite(checkIsFavorite as boolean);
-        } catch (err) {
-          console.error(err);
+        } else {
+          setIsFollowing(false);
+          setIsFavorite(false);
         }
-      };
-      getVideo();
-    } catch (err) {
-      console.log("Error happend ", err);
-    }
-  }, [id]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getVideo();
+  }, [id, user?.id]);
   if (post?.author?.isPrivate && authorId !== post?.authorId) return <p>This account is private</p>;
 
   return (
     <div className="min-h-screen bg-background text-foreground py-12 px-6 sm:px-10 md:px-16 lg:px-24 xl:px-32">
       <div className="max-w-[1800px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-20 items-start">
-          {/* USER AND POST DATA CARDS - match video height */}
           <div className="lg:col-span-3 flex flex-col gap-8 lg:sticky lg:top-8 lg:min-h-[72vh]">
             <div className="bg-surface border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col items-center text-center shadow-md">
               <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-tr from-white/20 to-white/10 p-[2px] mb-6">

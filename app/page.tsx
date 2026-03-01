@@ -5,6 +5,7 @@ import { PostType, PostTypeWithPages } from "@/Types/PostTypes";
 import { CategoryType } from "@/Types/CategoryType";
 import Pagination from "@/components/Pagination";
 import PostsGrid from "@/components/PostsGrid";
+import { toast } from "react-hot-toast";
 
 export default function Home() {
   const [posts, setPosts] = useState<PostType[]>([]);
@@ -15,8 +16,12 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get<PostTypeWithPages>(`http://localhost:5000/posts/all?page=${selectedPage}`) 
-        console.log(res.data.posts)
+        setLoading(true);
+        const res = await axios.get<PostTypeWithPages>(`${process.env.NEXT_PUBLIC_SERVER_URL}/posts/all?page=${selectedPage}`) 
+        if (!res.data) {
+          toast.error("Failed to fetch posts");
+          return;
+        }
        setTotalPages(res.data.totalPages);
         setPosts(res.data.posts);
       } catch (err) {
