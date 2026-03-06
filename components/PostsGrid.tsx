@@ -3,12 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiPlay, FiUser } from "react-icons/fi";
-import { PostType } from "@/Types/PostTypes";
-
-interface PostsGridProps {
-  posts: PostType[];
-  emptyMessage?: string;
-}
+import { PostsGridProps } from "@/Types/PropType";
 
 export default function PostsGrid({ posts, emptyMessage = "No posts available yet" }: PostsGridProps) {
   if (posts.length === 0) {

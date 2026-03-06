@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import { FiUser, FiMaximize2 } from "react-icons/fi";
 import Image from "next/image";
@@ -9,7 +9,6 @@ import { VideoCardPropsType } from "@/Types/PropType";
 export default function VideoCard({ id, username, title, post_url, authorId, avatar }: VideoCardPropsType) {
   const videoRef = useRef<HTMLVideoElement>(null); 
   const cardRef = useRef<HTMLDivElement>(null); 
-  const [count, setCount] = useState<number>(1);
 
   const isVideo =
     post_url.includes(".mp4") || post_url.includes(".webm") || post_url.includes(".mov") || post_url.includes("video");
@@ -19,8 +18,7 @@ export default function VideoCard({ id, username, title, post_url, authorId, ava
 
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          setCount((prev) => prev++);
+        const entry = entries[0];
 
           if (!videoRef.current) return;
 
@@ -29,7 +27,7 @@ export default function VideoCard({ id, username, title, post_url, authorId, ava
           } else {
             videoRef.current.pause();
           }
-        });
+        
       },
       { threshold: 0.5 },
     );

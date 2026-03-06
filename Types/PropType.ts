@@ -1,6 +1,7 @@
 import { UserProfileType } from "./UserTypes";
 import { ChangeEvent, FormEvent } from "react";
 import { EditFormData } from "./UserTypes";
+import { PostType } from "./PostTypes";
 export type VideoCardPropsType = {
   id: string;
   username: string;
@@ -37,4 +38,8 @@ export type EditProfilePropsType = {
   isProfileUpdating?: boolean;
   isAvatarUploading?: boolean;
   isAvatarDeleting?: boolean;
+};
+export type PostsGridProps = {
+  posts: PostType[];
+  emptyMessage?: string;
 };

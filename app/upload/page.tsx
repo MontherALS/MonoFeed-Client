@@ -29,40 +29,43 @@ export default function UploadPage() {
   const [showCategory, setShowCategory] = useState<boolean>(false);
 
   useEffect(() => {
-      if (!isAuthenticated) {
-        toast.error("Unauthorized");
-        router.push("/login");
-        return;
-      }
-      const getcategories = async () => {
-        try { 
+    if (!isAuthenticated) {
+      toast.error("Unauthorized");
+      router.push("/login");
+      return;
+    }
+    const getcategories = async () => {
+      try {
         const res = await authFetch("/posts/categories");
-          const data = await res?.json();
-          setCategory(data);
-        } catch (err) {
-          console.error("error happend ", err);
-        }
-      };
-      getcategories();
+        const data = await res?.json();
+        setCategory(data);
+      } catch (err) {
+        console.error("error happend ", err);
+      }
+    };
+    getcategories();
   }, [isAuthenticated, router]);
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-if (selectedFile && selectedFile.size > MAX_SIZE){
-        toast.error(`File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(selectedFile.size / 1024 / 1024).toFixed(2)}MB`);
-        e.target.value = "";
-        setFile(null);
-        setPreview(null);
-        return; 
-      }
+    if (selectedFile && selectedFile.size > MAX_SIZE) {
+      toast.error(
+        `File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(selectedFile.size / 1024 / 1024).toFixed(2)}MB`,
+      );
+      e.target.value = "";
+      setFile(null);
+      setPreview(null);
+      return;
+    }
     if (selectedFile && selectedFile.size <= MAX_SIZE) {
-      setFile(selectedFile); 
+      setFile(selectedFile);
 
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        setPreview(reader.result as string); 
+        setPreview(reader.result as string);
       };
-      reader.readAsDataURL(selectedFile); 
+      reader.readAsDataURL(selectedFile);
     }
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +89,11 @@ if (selectedFile && selectedFile.size > MAX_SIZE){
         return;
       }
 
-      if (file.size > MAX_SIZE){
-        toast.error(`File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-        return; 
+      if (file.size > MAX_SIZE) {
+        toast.error(
+          `File size must be < ${MAX_SIZE / 1024 / 1024}MB\nYour file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+        );
+        return;
       }
 
       setIsSubmitting(true);
@@ -145,9 +150,9 @@ if (selectedFile && selectedFile.size > MAX_SIZE){
   });
 
   return (
-      <div className="bg-background py-8 px-4 min-h-[calc(100vh-4rem)]">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-bold neon-text mb-8 tracking-tight">Upload Video</h1>
+    <div className="bg-background py-8 px-4 min-h-[calc(100vh-4rem)]">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-3xl font-bold neon-text mb-8 tracking-tight">Upload Video</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -181,16 +186,15 @@ if (selectedFile && selectedFile.size > MAX_SIZE){
           </div>
 
           <Input label="Post Title" placeholder="Enter video name" name="post_title" onChange={handleChange} required />
-          <Input
-            label="description"
-            placeholder="Enter video description"
-            name="description"
-            onChange={handleChange}
-            
-          />
+          <Input label="description" placeholder="Enter video description" name="description" onChange={handleChange} />
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
-            <Input className="mb-5" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search or add category" />
+            <Input
+              className="mb-5"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search or add category"
+            />
             <button
               type="button"
               className="bg-neon-cyan/20 border border-neon-cyan/40 w-full h-10 flex justify-center items-center rounded-2xl hover:bg-neon-cyan/30 hover:shadow-glow-cyan transition-all duration-300"
@@ -202,7 +206,9 @@ if (selectedFile && selectedFile.size > MAX_SIZE){
               <FiArrowDown className="text-neon-cyan" />
             </button>
 
-            <div className={`flex gap-5 flex-wrap visible ${categoryVisible} my-3 bg-surface-muted p-5 rounded-2xl border border-neon-purple/25`}>
+            <div
+              className={`flex gap-5 flex-wrap visible ${categoryVisible} my-3 bg-surface-muted p-5 rounded-2xl border border-neon-purple/25`}
+            >
               {filteredCategory.length <= 0 ? (
                 <button
                   type="button"
